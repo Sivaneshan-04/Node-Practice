@@ -1,0 +1,54 @@
+<%- include('../includes/head.ejs') %>
+
+    <link rel="stylesheet" href="/css/product.css">
+
+    </head>
+
+    <body>
+        <%- include('../includes/navigation.ejs') %>
+
+        <main>
+            <% if (products.length>0) { %>
+                    <div class="grid">
+                        <% for (let prods of products) { %>
+                            <article class="card product-item">
+                                <header class="card__header">
+                                    <h1 class="product__title">
+                                        <%= prods.productData.title %>
+                                    </h1>
+                                </header>
+                                <div class="card__image">
+                                    <img src="<%= prods.productData.imageUrl %>" alt="<%= prods.productData.title %>">
+                                </div>
+                                <div class="card__content">
+                                    <h2 class="product__price">$
+                                        <%= prods.productData.price %>
+                                    </h2>
+                                    <p class="product__description">
+                                        <%= prods.productData.description %>
+                                    </p>
+                                </div>
+                                <div class="card__content">
+                                    <h2 class="product__price">
+                                       Quantity = <%= prods.qty %>
+                                    </h2>
+                                </div>
+                                
+                                <div class="card__content">
+                                <form action="/cart-delete-product" method="POST">
+                                    <input type="hidden" value="<%= prods.productData.id %>" name="prodId" >
+                                    <input type="hidden" value="<%= prods.price %>" name="price" >
+                                    <button class="btn" type="submit">Delete</button>
+                                </form>
+                            </div>
+                            </article>
+                            <% } %>
+                    </div>
+                    
+            <% } else { %>
+
+                <h1>No Products in the Cart</h1>
+
+            <% } %>
+        </main>
+        <%- include('../includes/end.ejs') %>
