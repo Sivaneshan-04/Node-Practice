@@ -10,6 +10,15 @@
 .centered img{
   width: 30%;
 }
+
+.image{
+  height: 20rem;
+}
+
+.image img{
+  height: 100%;
+}
+
 body {
   padding: 0;
   margin: 0;
