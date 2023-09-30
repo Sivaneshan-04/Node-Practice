@@ -17,10 +17,8 @@ exports.postAddProduct = (req, res, next) => {
   const description = req.body.description;
   const imageUrl = req.body.imageUrl;
 
-  // const product = new Product(title, imageUrl, description, price, null);
-  // product.save();
-
-  Product.create({ title, price, imageUrl, description })
+  //using sequelizer's magic function
+  req.user.createProduct({ title, price, imageUrl, description })
     .then((result) => {
       console.log("result created");
       res.redirect("/admin/products");
@@ -43,9 +41,10 @@ exports.getEditProduct = (req, res, next) => {
   //     product,
   //   });
   // });
-
-  Product.findByPk(prodId)
-    .then((product) => {
+  req.user.getProducts()
+  // Product.findByPk(prodId)
+    .then((products) => {
+      const product=products[0];
       if (!product) {
         return res.redirect("/");
       }
@@ -113,7 +112,7 @@ exports.getProducts = (req, res, next) => {
   //   });
   // });
 
-  Product.findAll()
+ req.user.getProducts()
     .then((products) => {
       res.render("admin/productList", {
         prods: products,

@@ -3,8 +3,8 @@ const Sequelizer = require('sequelize');
 const sequelize = require('../utils/database');
 
 
-const Cart = sequelize.define(
-  'cart',
+const Order = sequelize.define(
+  'order',
   {
     id:{
       type:Sequelizer.INTEGER,
@@ -15,4 +15,4 @@ const Cart = sequelize.define(
   }
 );
 
-module.exports= Cart;
+module.exports= Order;

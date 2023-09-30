@@ -14,29 +14,29 @@
                             <article class="card product-item">
                                 <header class="card__header">
                                     <h1 class="product__title">
-                                        <%= prods.productData.title %>
+                                        <%= prods.title %>
                                     </h1>
                                 </header>
                                 <div class="card__image">
-                                    <img src="<%= prods.productData.imageUrl %>" alt="<%= prods.productData.title %>">
+                                    <img src="<%= prods.imageUrl %>" alt="<%= prods.title %>">
                                 </div>
                                 <div class="card__content">
                                     <h2 class="product__price">$
-                                        <%= prods.productData.price %>
+                                        <%= prods.price %>
                                     </h2>
                                     <p class="product__description">
-                                        <%= prods.productData.description %>
+                                        <%= prods.description %>
                                     </p>
                                 </div>
                                 <div class="card__content">
                                     <h2 class="product__price">
-                                       Quantity = <%= prods.qty %>
+                                       Quantity = <%= prods.cartItem.quantity %>
                                     </h2>
                                 </div>
                                 
                                 <div class="card__content">
                                 <form action="/cart-delete-product" method="POST">
-                                    <input type="hidden" value="<%= prods.productData.id %>" name="prodId" >
+                                    <input type="hidden" value="<%= prods.id %>" name="prodId" >
                                     <input type="hidden" value="<%= prods.price %>" name="price" >
                                     <button class="btn" type="submit">Delete</button>
                                 </form>
@@ -44,7 +44,12 @@
                             </article>
                             <% } %>
                     </div>
-                    
+                    <hr>
+                    <div class="grid">
+                        <form action="/create-order" method="POST">
+                            <button class="btn" type="submit">Order Now!</button>
+                        </form>
+                    </div>
             <% } else { %>
 
                 <h1>No Products in the Cart</h1>
