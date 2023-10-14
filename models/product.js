@@ -1,82 +1,55 @@
-// const fs = require("fs");
-// const path = require("path");
-// const Cart = require("./cart");
+const connection = require("../utils/database");
+const mongoDb = require('mongodb');
 
-// const db = require("../utils/database");
+const getDb = connection.getDb;
 
-// // const getData = (c)=>{
-// //     const p = (path.join(__dirname,'../','data','products.json'));
-// //         fs.readFile(p,(err,fileData)=>{
+class Product {
+  constructor(title, price, description, imageUrl,id) {
+    this.title = title;
+    this.price = price;
+    this.description = description;
+    this.imageUrl = imageUrl;
+    this._id= id? new mongoDb.ObjectId(id): null;
 
-// //             if(err){
-// //                 return c([]);
-// //             }
-// //             c(JSON.parse(fileData));
-// //         })
-// // }
+  }
 
-// module.exports = class Product {
-//   constructor(title, imageUrl, description, price, id) {
-//     this.id = id;
-//     this.title = title;
-//     this.imageUrl = imageUrl;
-//     this.description = description;
-//     this.price = price;
-//   }
+  save() {
+    const db = getDb();
+    let dbop;
 
-//   save() {
-//     // getData((products)=>{
-//     //     if(this.id){
-//     //         const existingProductIndex=products.findIndex(p=>p.id===this.id);
-//     //         products[existingProductIndex]=this;
-//     //     }
-//     //     else{
-//     //         this.id= Math.random().toString();
-//     //         products.push(this);
-//     //     }
-//     //     const p = (path.join(__dirname,'../','data','products.json'));
-//     //     fs.writeFile(p,JSON.stringify(products),(err)=>{
-//     //         console.log(err);
-//     //     });
-//     // });
+    if(this._id){
+      console.log('this ran');
+      dbop = db.collection('products').updateOne({_id: (this._id)},{$set:this});
+    }else{
+      console.log('no this ran');
+      dbop=db.collection("products").insertOne(this);
+    }
+      return dbop
+      .then((result) => console.log(result))
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
-//     return db.execute(
-//       "INSERT INTO products (title,price,imageUrl,description) VALUES (?,?,?,?)",
-//       [this.title, this.price, this.imageUrl, this.description]
-//     );
-//   }
+   static fetchById(id){
+    return getDb().collection('products').find({_id: new mongoDb.ObjectId(id)}).next().then(result=>{
+      return result;
+    }).catch(err=>console.log(err));
+  }
 
-//   static fetchAll(c) {
-//     // getData(c);
+  static fetchAll(){
+    return getDb().collection('products').find().toArray().then((result)=>{
+      return result;
+    }).catch(err=>console.log(err));
+  }
 
-//     return db.execute("SELECT * FROM products");
-//   }
+  static deleteById(prodId){
+    const id = new mongoDb.ObjectId(prodId);
+    return getDb().collection('products').deleteOne({_id:id}).then(result=>{
+      console.log('Product Deleted!!');
+    }).catch(err=>console.log(err));
+  }
 
-//   static deleteById(id) {
-//     // getData(products=>{
-//     //     const product = products.find(p=> p.id=== id);
-//     //     const updatedProducts = products.filter(p=>p.id !== id);
-//     //     const p = (path.join(__dirname,'../','data','products.json'));
-//     //     fs.writeFile(p,JSON.stringify(updatedProducts),(err)=>{
-//     //         if(!err){
-//     //             Cart.deleteProduct(id,product.price);
-//     //         }
-//     //     }
-//     //     );
-//     // })
-//   }
+}
 
-//   static findById(id, cb) {
-//     // getData(products=>{
-//     //     const product = products.find(p=>p.id===id);
-//     //     if(product){
-//     //         cb(product);
-//     //     }
-//     //     else{
-//     //         cb({});
-//     //     }
-//     // })
-
-//     return db.execute('SELECT * FROM products WHERE products.id = ?',[id])
-//   }
-// };
+module.exports = Product;

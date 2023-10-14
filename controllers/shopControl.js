@@ -1,6 +1,5 @@
-//const Product = require("../models/product");
-const Product = require("../models/new-product");
-const Order = require("../models/order");
+const Product = require("../models/product");
+// const Order = require("../models/order");
 exports.getIndex = (req, res, next) => {
   // Product.fetchAll()
   //   .then(([rows]) => {
@@ -12,7 +11,7 @@ exports.getIndex = (req, res, next) => {
   //   })
   //   .catch((err) => console.log(err));
 
-  Product.findAll()
+  Product.fetchAll()
     .then((products) => {
       res.render("shop/shop", {
         prods: products,
@@ -25,47 +24,16 @@ exports.getIndex = (req, res, next) => {
 
 exports.getEachProd = (req, res, next) => {
   const id = req.params.ID;
-  // Product.findById(id, (p) => {
-  //   res.render("shop/product-detail", {
-  //     p,
-  //     pageTitle: p.title,
-  //     path: "/products/new",
-  //   });
-  // });
-
-  // Product.findById(id).then(([product])=>{
-  //   res.render("shop/product-detail", {
-  //         p:product[0],
-  //         pageTitle: product[0].title,
-  //         path: "/products/new",
-  //       }
-  //     )}).catch(err=>console.log(err));
-
-  Product.findByPk(id)
+  console.log(id);
+  Product.fetchById(id)
     .then((p) => {
       res.render("shop/product-detail", {
         p,
         pageTitle: p.title,
-        path: "/products/new",
+        path: "/products",
       });
     })
     .catch((err) => console.log(err));
-
-  //alternative sequelizer method
-  //this is prefered though
-  // Product.findAll({
-  //   where:{
-  //     id:id,
-  //   }
-  // }).then(
-  //   (p) => {
-  //     res.render("shop/product-detail", {
-  //       p:p[0],
-  //       pageTitle: p[0].title,
-  //       path: "/products/new",
-  //     });
-  //   }
-  // ).catch(err=>console.log(err));
 };
 
 exports.getProducts = (req, res, next) => {
@@ -90,7 +58,7 @@ exports.getProducts = (req, res, next) => {
   //   })
   //   .catch((err) => console.log(err));
 
-  Product.findAll()
+  Product.fetchAll()
     .then((products) => {
       res.render("shop/product-list", {
         prods: products,
