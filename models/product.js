@@ -18,7 +18,6 @@ class Product {
     let dbop;
 
     if(this._id){
-      console.log('this ran');
       dbop = db.collection('products').updateOne({_id: (this._id)},{$set:this});
     }else{
       console.log('no this ran');
