@@ -14,18 +14,18 @@
                             <article class="card product-item">
                                 <header class="card__header">
                                     <h1 class="product__title">
-                                        <%= prods.title %>
+                                        <%= prods.productId.title %>
                                     </h1>
                                 </header>
                                 <div class="card__image">
-                                    <img src="<%= prods.imageUrl %>" alt="<%= prods.title %>">
+                                    <img src="<%= prods.productId.imageUrl %>" alt="<%= prods.productId.title %>">
                                 </div>
                                 <div class="card__content">
                                     <h2 class="product__price">$
-                                        <%= prods.price %>
+                                        <%= prods.productId.price %>
                                     </h2>
                                     <p class="product__description">
-                                        <%= prods.description %>
+                                        <%= prods.productId.description %>
                                     </p>
                                 </div>
                                 <div class="card__content">
@@ -36,8 +36,8 @@
                                 
                                 <div class="card__content">
                                 <form action="/cart-delete-product" method="POST">
-                                    <input type="hidden" value="<%= prods._id %>" name="prodId" >
-                                    <input type="hidden" value="<%= prods.price %>" name="price" >
+                                    <input type="hidden" value="<%= prods.productId._id %>" name="prodId" >
+                                    <input type="hidden" value="<%= prods.productId.price %>" name="price" >
                                     <button class="btn" type="submit">Delete</button>
                                 </form>
                             </div>
