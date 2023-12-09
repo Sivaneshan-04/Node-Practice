@@ -4,6 +4,7 @@ exports.getAddProduct = (req, res, next) => {
   res.render("admin/add-product", {
     pageTitle: "Add Product",
     path: "/admin/add-product",
+    isLogin : req.session.isLoggedIn,
     // productCSS: true,
     // formsCSS: true,
     // activeAddProduct: true,
@@ -47,6 +48,7 @@ exports.getEditProduct = (req, res, next) => {
         pageTitle: "Edit Product",
         path: "/admin/edit-product",
         product,
+        isLogin : req.session.isLoggedIn
       });
     })
     .catch((err) => console.log(err));
@@ -92,6 +94,7 @@ exports.getProducts = (req, res, next) => {
         prods: products,
         pageTitle: "Admin Products",
         path: "/admin/products",
+        isLogin : req.session.isLoggedIn
       });
     })
     .catch((err) => console.log(err));

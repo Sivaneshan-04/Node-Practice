@@ -2,23 +2,29 @@ const express = require("express");
 const path = require("path");
 
 const bodyParser = require("body-parser");
-const app = express();
 const mongoose = require("mongoose");
+const session = require('express-session');
+const mongoStore = require('connect-mongodb-session')(session);
 
 const shopRoutes = require("./routes/shop");
 const adminData = require("./routes/admin");
+const loginRoutes = require('./routes/login');
+
+const store = new mongoStore({
+  uri:"mongodb+srv://siva:Shadow@cluster0.mcuyzrw.mongodb.net/new?retryWrites=true&w=majority",
+  collection:'session'
+})
 
 const User = require("./models/user");
 
-//app starts here
-app.set("view engine", "ejs");
+//Express app starts here
+const app = express();
 
-// app.engine('hbs',expressHbr.engine({layoutsDir: 'views/layouts',extname:'hbs',defaultLayout:'main-layout'}));
-// app.set('view engine','hbs');
-//app.set('view engine','hbs');
+app.set("view engine", "ejs");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
+app.use(session({secret: 'this is my secret',saveUninitialized: false, resave: false,store: store}));
 
 //To create a new user using mongoDb
 // app.use((req,res,next)=>{
@@ -30,14 +36,19 @@ app.use(express.static(path.join(__dirname, "public")));
 
 //Creating a new user using Mongoose
 app.use((req,res,next)=>{
-  User.findById('656f1046c3ba3f5797db0a80').then(user=>{
-    req.user = user
+  if(!req.session.user){
+    return next();
+  }
+  User.findById(req.session.user._id).then(user=>{
+    req.user = user;
     next();
   }).catch(err=>console.log(err));
 });
 
-app.use(shopRoutes);
 app.use("/admin", adminData.routes);
+app.use(shopRoutes);
+app.use(loginRoutes.routes);
+
 
 app.use((req, res, next) => {
   res
