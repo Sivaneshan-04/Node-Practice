@@ -8,7 +8,7 @@ exports.getIndex = (req, res, next) => {
         prods: products,
         pageTitle: "List",
         path: "/shop",
-        isLogin : req.session.isLoggedIn
+        isLogin : req.session.isLogin
       });
     })
     .catch((err) => console.log(err));
@@ -22,7 +22,7 @@ exports.getEachProd = (req, res, next) => {
         p,
         pageTitle: p.title,
         path: "/products",
-        isLogin : req.session.isLoggedIn
+        isLogin : req.session.isLogin
       });
     })
     .catch((err) => console.log(err));
@@ -35,7 +35,7 @@ exports.getProducts = (req, res, next) => {
         prods: products,
         pageTitle: "Shop",
         path: "/products",
-        isLogin : req.session.isLoggedIn
+        isLogin : req.session.isLogin
       });
     })
     .catch((err) => console.log(err));
@@ -49,7 +49,7 @@ exports.getCart = (req, res, next) => {
         path: "/cart",
         pageTitle: "My Cart",
         products: user.cart.items,
-        isLogin : req.session.isLoggedIn
+        isLogin : req.session.isLogin
       });
     })
     .catch((err) => console.log(err));
@@ -75,7 +75,7 @@ exports.postCart = (req, res, next) => {
 //   res.render("shop/checkout", {
 //     path: "/checkout",
 //     pageTitle: "Checkout",
-//     isLogin : req.session.isLoggedIn
+//     isLogin : req.session.isLogin
 //   });
 // };
 
@@ -99,7 +99,7 @@ exports.getOrders = (req, res, next) => {
         path: "/orders",
         pageTitle: "Orders",
         orders: order,
-        isLogin : req.session.isLoggedIn
+        isLogin : req.session.isLogin
       });
     })
     .catch((err) => console.log(err));
@@ -110,7 +110,7 @@ exports.postOrder = (req, res, next) => {
     const product = user.cart.items;
 
     const order = new Order({
-      user: { name: req.user.name, userId: req.user },
+      user: { name: req.user.name, userId: req.user, email: req.user.email },
       prods: product.map((i) => {
         return {
           quantity: i.quantity,
