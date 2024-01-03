@@ -1,10 +1,11 @@
 const Product = require("../models/product");
+const {validationResult} = require('express-validator');
 
 exports.getAddProduct = (req, res, next) => {
   res.render("admin/add-product", {
     pageTitle: "Add Product",
     path: "/admin/add-product",
-    isLogin : req.session.isLoggedIn,
+    isLogin : req.session.isLogin,
     // productCSS: true,
     // formsCSS: true,
     // activeAddProduct: true,
@@ -16,6 +17,16 @@ exports.postAddProduct = (req, res, next) => {
   const price = req.body.price;
   const description = req.body.description;
   const imageUrl = req.body.imageUrl;
+  const errors = validationResult(req);
+
+  if(!errors.isEmpty()){
+    return res.status(422).render("admin/edit-product", {
+      pageTitle: "Add Product",
+      path: "/admin/edit-product",
+      product,
+      isLogin : req.session.isLogin
+    });
+  }
 
   const product = new Product({
     title: title,
@@ -48,7 +59,7 @@ exports.getEditProduct = (req, res, next) => {
         pageTitle: "Edit Product",
         path: "/admin/edit-product",
         product,
-        isLogin : req.session.isLoggedIn
+        isLogin : req.session.isLogin
       });
     })
     .catch((err) => console.log(err));
@@ -69,17 +80,25 @@ exports.postEditProduct = (req, res, next) => {
     userId: req.user
   };
 
-  Product.findByIdAndUpdate(prodId, product)
-    .then(res.redirect("/admin/products"))
-    .catch((err) => {
-      console.log(err);
-    });
+  Product.findById(prodId).then((prod) => {
+    if (prod.userId.toString() !== req.user._id.toString()) {
+      return res.redirect('/');
+    } else {
+      return Product.findByIdAndUpdate(prodId, product)
+        .then(res.redirect("/admin/products"))
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  });
+
+  
 };
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.prodId;
 
-  Product.findByIdAndDelete(prodId)
+  Product.deleteOne({ _id: prodId, userId: req.user._id})
     .then((result) => {
       console.log("Destroyed!!");
       res.redirect("/admin/products");
@@ -88,13 +107,13 @@ exports.postDeleteProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.find()
+  Product.find({userId : req.user._id})
     .then((products) => {
       res.render("admin/productList", {
         prods: products,
         pageTitle: "Admin Products",
         path: "/admin/products",
-        isLogin : req.session.isLoggedIn
+        isLogin : req.session.isLogin
       });
     })
     .catch((err) => console.log(err));
