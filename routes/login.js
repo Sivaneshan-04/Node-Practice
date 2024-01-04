@@ -15,6 +15,7 @@ router.post("/login",[
       if (!user) {
         return Promise.reject("Email not found");
       }
+      
     });
   }),
   body("password", "Please enter a password with only numbers and text and at least 5 characters").isAlphanumeric().isLength({ min: 5 }).trim().custom((value, { req }) => {

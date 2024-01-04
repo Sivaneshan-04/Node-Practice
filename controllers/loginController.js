@@ -36,7 +36,7 @@ exports.getLogin = (req, res, next) => {
 
 exports.postLogin = (req, res, next) => {
   const password = req.body.password;
-  console.log(password);
+  // console.log(password);
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
@@ -54,9 +54,21 @@ exports.postLogin = (req, res, next) => {
     });
   };
 
-  return req.session.save((err) => {
+  return User.findOne({ email: req.body.email }).then((user) => {
+    req.session.user = user;
+      req.session.isLogin = true;
+      req.session.save(err => {
+        console.log(err);
+        res.redirect("/");
+      });      
+      return transporter.sendMail({
+        to: req.body.email,
+        from: process.env.FROM_EMAIL,
+        subject: "Successfully loggedin",
+        html: "<h1>Welcome to our shop</h1>",
+      });
+  }).catch(err => {
     console.log(err);
-    res.redirect("/");
   });
 };
 

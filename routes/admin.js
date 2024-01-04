@@ -9,11 +9,11 @@ const addProductValidator = require('../middleware/shopValidator');
 
 router.get('/add-product',isAuth,adminController.getAddProduct);
 
-router.post('/add-product',addProductValidator,isAuth,adminController.postAddProduct);
+router.post('/add-product',isAuth,adminController.postAddProduct);
 
 router.get('/edit-product/:id',isAuth,adminController.getEditProduct);
 
-router.post('/edit-product',addProductValidator,isAuth,adminController.postEditProduct);
+router.post('/edit-product',isAuth,adminController.postEditProduct);
 
 router.post('/delete-product',isAuth,adminController.postDeleteProduct);
 

@@ -27,13 +27,14 @@ exports.postAddProduct = (req, res, next) => {
       isLogin : req.session.isLogin
     });
   }
+  console.log('id',req.user._id)
 
   const product = new Product({
     title: title,
     price: price,
     description: description,
     imageUrl: imageUrl,
-    userId: req.user
+    userId: req.user._id
   });
 
   product
@@ -87,7 +88,9 @@ exports.postEditProduct = (req, res, next) => {
       return Product.findByIdAndUpdate(prodId, product)
         .then(res.redirect("/admin/products"))
         .catch((err) => {
-          console.log(err);
+          const error = new Error(err);
+          error.httpStatusCode = 500;
+          return next(error);
         });
     }
   });
