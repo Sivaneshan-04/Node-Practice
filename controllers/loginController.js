@@ -8,7 +8,7 @@ const transporter = nodemailer.createTransport(
   sendgridTransport({
     auth: {
       api_key:
-        "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",
+      process.env.API_KEY,
     },
   })
 );
@@ -36,7 +36,7 @@ exports.getLogin = (req, res, next) => {
 
 exports.postLogin = (req, res, next) => {
   const password = req.body.password;
-  console.log(password);
+  // console.log(password);
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
@@ -54,9 +54,21 @@ exports.postLogin = (req, res, next) => {
     });
   };
 
-  return req.session.save((err) => {
+  return User.findOne({ email: req.body.email }).then((user) => {
+    req.session.user = user;
+      req.session.isLogin = true;
+      req.session.save(err => {
+        console.log(err);
+        res.redirect("/");
+      });      
+      return transporter.sendMail({
+        to: req.body.email,
+        from: process.env.FROM_EMAIL,
+        subject: "Successfully loggedin",
+        html: "<h1>Welcome to our shop</h1>",
+      });
+  }).catch(err => {
     console.log(err);
-    res.redirect("/");
   });
 };
 
@@ -134,7 +146,7 @@ exports.postSignup = (req, res, next) => {
           res.redirect("/login");
           return transporter.sendMail({
             to: email,
-            from: "sivaneshankg12@gmail.com",
+            from: process.env.FROM_EMAIL,
             subject: "Successfully signedup",
             html: "<h1>Welcome to our shop</h1>",
           });
@@ -143,7 +155,11 @@ exports.postSignup = (req, res, next) => {
           console.log(err);
         });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error);
+  });;
 };
 
 exports.postLogout = (req, res, next) => {

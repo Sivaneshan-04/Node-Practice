@@ -32,19 +32,9 @@ app.set("view engine", "ejs"); //assigning the default engine
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
-app.use(session({secret: 'this is my secret',saveUninitialized: false, resave: false,store: store}));
+app.use(session({secret: process.env.SESSION_SECRET_KEY,saveUninitialized: false, resave: false,store: store}));
 app.use(csrfProtection);
 app.use(flash());
-
-app.use((req,res,next)=>{  //Creating a new user using Mongoose
-  if(!req.session.user){
-    return next();
-  }
-  User.findById(req.session.user._id).then(user=>{
-    req.user = user;
-    next();
-  }).catch(err=>console.log(err));
-});
 
 app.use((req,res,next)=>{
   res.locals.isLogin = req.session.isLogin;
@@ -52,9 +42,26 @@ app.use((req,res,next)=>{
   next();
 });
 
+app.use((req,res,next)=>{  //Creating a new user using Mongoose
+  if(!req.session.user){
+    return next();
+  }
+  User.findById(req.session.user._id).then(user=>{
+    if(!user){
+      return next(); 
+    }
+    req.user = user;
+    next();
+  }).catch(err=>{throw new Error(err)});
+});
+
 app.use("/admin", adminData.routes);
 app.use(shopRoutes);
 app.use(loginRoutes.routes);
+
+app.use((error,req,res,next)=>{
+  res.status(500).render('500',{pageTitle:'Error',path:undefined});
+});
 
 app.use((req, res, next) => { //Rendering the 404 page
   res
@@ -62,15 +69,16 @@ app.use((req, res, next) => { //Rendering the 404 page
   .render("404", { pageTitle: "Page Not Found", path: undefined });
 });
 
+
 //Starting the app
 mongoose    //Mongoose goes here
 .connect(
-  process.env.MONGO_URI,{ useNewUrlParser: true,useUnifiedTopology: true }
+  process.env.MONGO_URI
   )
   .then((result) => {
     app.listen(3000);
   })
-  .catch((err) => console.log(err));
+  .catch((err) => console.log(err)); 
   
 
 
