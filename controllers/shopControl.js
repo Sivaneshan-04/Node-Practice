@@ -1,3 +1,7 @@
+const fs = require('fs');
+const path = require('path');
+const PDFdoument = require('pdfkit');
+
 const Product = require("../models/product");
 const Order = require("../models/order");
 
@@ -154,3 +158,54 @@ exports.postOrder = (req, res, next) => {
       return next(error);
     });
 };
+
+
+exports.getInvoice = (req, res, next) => {
+  const orderId = req.params.orderId;
+  const invoiceName = "invoice-" + orderId + ".pdf";
+  const invoicePath = path.join('data','invoice',invoiceName);
+
+  Order.findById(orderId).then((order)=>{
+    if(!order){
+      return (next(new Error('No order found')));
+    }
+
+    if(order.user.userId.toString() !== req.user._id.toString()){
+      return next(new Error('You are unathorized!!'));
+    }
+    // fs.readFile(invoicePath,(err,data)=>{
+    //   if(err){
+    //     next(err);
+    //   }
+    //   res.setHeader('Content-Type','application/pdf');
+    //   res.setHeader('Content-Disposition','inline; filename="'+invoiceName+'"');
+    //   res.send(data);
+    // })
+
+
+    //this is the recommended way
+    // const file = fs.createReadStream(invoicePath);
+    // res.setHeader('Content-Type','application/pdf');
+    // res.setHeader('Content-Disposition','inline; filename="'+invoiceName+'"');
+    // file.pipe(res);//to forward the stream to the response
+
+    const pdf = new PDFdoument();
+    res.setHeader('Content-Type','application/pdf');
+    res.setHeader('Content-Disposition','inline; filename="'+invoiceName+'"');
+    pdf.pipe(fs.createWriteStream(invoicePath));
+    pdf.pipe(res);
+    pdf.fontSize(26).text('Invoice');
+    pdf.text('---------------------------------------------');
+    pdf.text('');
+    let totalPrice = 0;
+    order.prods.forEach(prod=>{
+      totalPrice += prod.quantity * prod.productData.price;
+      pdf.fontSize(14).text(prod.productData.title + ' -> ' + prod.quantity + ' x ' + '$' + prod.productData.price);
+    });
+    pdf.text('---------------------------------------------');
+    pdf.text('');
+    pdf.fontSize(18).text('Total Price: $'+ totalPrice);
+    pdf.end();
+  }).catch(err=>next(err));  
+};
+

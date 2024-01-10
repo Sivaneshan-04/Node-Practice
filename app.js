@@ -9,6 +9,7 @@ const session = require('express-session');
 const csrf = require('csurf');
 const flash = require('connect-flash');
 require('dotenv').config();
+const multer = require('multer');
 
 //File imports
 const shopRoutes = require("./routes/shop");
@@ -24,6 +25,23 @@ const store = new mongoStore({
 })
 const csrfProtection= csrf();
 
+//configure multer
+const storage = multer.diskStorage({
+  destination : (req,file,cb)=>{
+      cb(null,'images');
+  },
+  filename : (req,file,cb)=>{
+      cb(null,Date.now().toString()+'-'+file.originalname);
+  }
+});
+
+const fileFilter = (req,file,cb)=>{
+  if(file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg'){
+      cb(null,true);
+  }else{
+      cb(null,false);
+  }
+}
 
 //Express app starts here 
 const app = express();
@@ -31,7 +49,9 @@ const app = express();
 app.set("view engine", "ejs"); //assigning the default engine
 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(multer({storage:storage, fileFilter: fileFilter}).single('image'));
 app.use(express.static(path.join(__dirname, "public")));
+app.use('/images',express.static(path.join(__dirname, "images")));
 app.use(session({secret: process.env.SESSION_SECRET_KEY,saveUninitialized: false, resave: false,store: store}));
 app.use(csrfProtection);
 app.use(flash());
@@ -59,14 +79,14 @@ app.use("/admin", adminData.routes);
 app.use(shopRoutes);
 app.use(loginRoutes.routes);
 
-app.use((error,req,res,next)=>{
-  res.status(500).render('500',{pageTitle:'Error',path:undefined});
-});
+// app.use((error,req,res,next)=>{
+//   res.status(500).render('500',{pageTitle:'Error',path:undefined, isLogin : req.session.isLogin});
+// });
 
 app.use((req, res, next) => { //Rendering the 404 page
   res
   .status(404)
-  .render("404", { pageTitle: "Page Not Found", path: undefined });
+  .render("404", { pageTitle: "Page Not Found", path: undefined ,isLogin : req.session.isLogin});
 });
 
 
