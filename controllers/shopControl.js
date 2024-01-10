@@ -5,22 +5,53 @@ const PDFdoument = require('pdfkit');
 const Product = require("../models/product");
 const Order = require("../models/order");
 
+//number per page
+const PRODUCT_PER_PAGE = 1;
+
 exports.getIndex = (req, res, next) => {
-  Product.find()
-    .then((products) => {
+  const page = +req.query.page || 1;
+  let totalItems;
+
+  Product.find().countDocuments().then(num=>{
+    totalItems = num;
+    return Product.find()
+    .skip((page-1)*PRODUCT_PER_PAGE)
+    .limit(PRODUCT_PER_PAGE)
+  }).then((products) => {
       res.render("shop/shop", {
         prods: products,
-        pageTitle: "List",
+        pageTitle: "Shop",
         path: "/shop",
-        isLogin : req.session.isLogin
+        isLogin : req.session.isLogin,
+        lastPage: Math.ceil(totalItems / PRODUCT_PER_PAGE),
+        currentPage: page,
       });
     })
     .catch((err) => {
     const error = new Error(err);
     error.httpStatusCode = 500;
     return next(error);
-  });;
+  });
 };
+
+
+//   Product.find()
+//   .skip((page-1)*2)
+//   .limit(PRODUCT_PER_PAGE)
+//     .then((products) => {
+//       res.render("shop/shop", {
+//         prods: products,
+//         pageTitle: "List",
+//         path: "/shop",
+//         isLogin : req.session.isLogin
+//       });
+//     })
+//     .catch((err) => {
+//     const error = new Error(err);
+//     error.httpStatusCode = 500;
+//     return next(error);
+//   });;
+// };
 
 exports.getEachProd = (req, res, next) => {
   const id = req.params.ID;
@@ -41,13 +72,29 @@ exports.getEachProd = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.find()
-    .then((products) => {
+  const page = +req.query.page || 1;
+  // Product.find()
+  //   .then((products) => {
+  //     res.render("shop/product-list", {
+  //       prods: products,
+  //       pageTitle: "Shop",
+  //       path: "/products",
+  //       isLogin : req.session.isLogin
+  //     });
+  //   })
+  Product.find().countDocuments().then(num=>{
+    totalItems = num;
+    return Product.find()
+    .skip((page-1)*PRODUCT_PER_PAGE)
+    .limit(PRODUCT_PER_PAGE)
+  }).then((products) => {
       res.render("shop/product-list", {
         prods: products,
-        pageTitle: "Shop",
+        pageTitle: "Products",
         path: "/products",
-        isLogin : req.session.isLogin
+        isLogin : req.session.isLogin,
+        lastPage: Math.ceil(totalItems / PRODUCT_PER_PAGE),
+        currentPage: page,
       });
     })
     .catch((err) => {
