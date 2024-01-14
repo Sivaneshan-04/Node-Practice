@@ -6,7 +6,7 @@ const Product = require("../models/product");
 const Order = require("../models/order");
 
 //number per page
-const PRODUCT_PER_PAGE = 1;
+const PRODUCT_PER_PAGE = 2;
 
 exports.getIndex = (req, res, next) => {
   const page = +req.query.page || 1;
