@@ -35,22 +35,25 @@
                                 </div>
                                 
                                 <div class="card__content">
-                                <form action="/cart-delete-product" method="POST">
+                                <!-- <form action="/cart-delete-product" method="POST">
                                     <input type="hidden" value="<%= prods.productId._id %>" name="prodId" >
                                     <input type="hidden" value="<%= prods.productId.price %>" name="price" >
                                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                     <button class="btn" type="submit">Delete</button>
-                                </form>
+                                </form> -->
+
+                                <a class="btn" href="/checkout">Order Now</a>
                             </div>
                             </article>
                             <% } %>
                     </div>
                     <hr>
                     <div class="grid">
-                        <form action="/create-order" method="POST">
+                        <!-- <form action="/create-order" method="POST">
                             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                             <button class="btn" type="submit">Order Now!</button>
-                        </form>
+                        </form> -->
+                        <a class="btn" href="/checkout">Order Now</a>
                     </div>
             <% } else { %>
 

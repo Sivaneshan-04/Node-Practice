@@ -16,9 +16,14 @@ router.get('/products',shopController.getProducts);
 
 router.get('/products/:ID',shopController.getEachProd);
 
-// router.get('/checkout',shopController.getCheckout);
+router.get('/checkout',shopController.getCheckout);
 
 router.get('/orders',isAuth,shopController.getOrders);
+
+//Remember to protect this route after deploying the website
+router.get('/checkout/success', shopController.getOrder);
+
+router.get('/checkout/cancel', shopController.getCheckout);
 
 router.post('/create-order',isAuth,shopController.postOrder);
 
